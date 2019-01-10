@@ -2355,6 +2355,7 @@ static int32_t __CFRunLoopRun(CFRunLoopRef rl, CFRunLoopModeRef rlm, CFTimeInter
     if (libdispatchQSafe && (CFRunLoopGetMain() == rl) && CFSetContainsValue(rl->_commonModes, rlm->_name)) dispatchPort = _dispatch_get_main_queue_port_4CF();
     
 #if USE_DISPATCH_SOURCE_FOR_TIMERS
+    //在ios中 port 事件能勾起 该执行
     
     mach_port_name_t modeQueuePort = MACH_PORT_NULL;
     // 如果运行模式的队列存在
