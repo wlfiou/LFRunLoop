@@ -641,7 +641,7 @@ struct __CFRunLoop {
     volatile _per_run_data *_perRunData;              // reset for runs of the run loop
     pthread_t _pthread;//对应的线程
     uint32_t _winthread;
-    CFMutableSetRef _commonModes;//存储的是字符串，记录所有标记为common的mode
+    CFMutableSetRef _commonModes;//存储的是字符串，记录所有标记为common的mode 通过将其 ModeName 添加到 RunLoop 的 “commonModes” 中
     CFMutableSetRef _commonModeItems;//存储所有commonMode的item(source、timer、observer)
     CFRunLoopModeRef _currentMode;//当前运行的mode
     CFMutableSetRef _modes;//存储的是CFRunLoopModeRef，
@@ -2735,10 +2735,14 @@ SInt32 CFRunLoopRunSpecific(CFRunLoopRef rl, CFStringRef modeName, CFTimeInterva
 
  */
     //即将进入循环
-	if (currentMode->_observerMask & kCFRunLoopEntry ) __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopEntry);
+	if (currentMode->_observerMask & kCFRunLoopEntry )
+        /// 1. 通知 Observers: RunLoop 即将进入 loop。
+      __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopEntry);
 	result = __CFRunLoopRun(rl, currentMode, seconds, returnAfterSourceHandled, previousMode);
     //即将退出循环
-	if (currentMode->_observerMask & kCFRunLoopExit ) __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopExit);
+	if (currentMode->_observerMask & kCFRunLoopExit )
+        /// 10 通知 Observers: RunLoop 即将退出 loop。
+        __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopExit);
 
         __CFRunLoopModeUnlock(currentMode);
         __CFRunLoopPopPerRunData(rl, previousPerRun);
